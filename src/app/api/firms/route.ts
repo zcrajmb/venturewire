@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma';
  */
 export async function GET(request: NextRequest) {
   try {
-    const firms = await prisma.vcFirm.findMany({
+    const firms = await prisma.vCFirm.findMany({
       include: {
         _count: {
           select: {
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       {
-        firms: firms.map((firm) => ({
+        firms: firms.map((firm: any) => ({
           ...firm,
           articleCount: firm._count.articles,
         })),

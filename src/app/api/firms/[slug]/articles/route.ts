@@ -7,17 +7,18 @@ import { prisma } from '@/lib/prisma';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '12', 10);
 
     const skip = (page - 1) * limit;
 
-    const firm = await prisma.vcFirm.findUnique({
-      where: { slug: params.slug },
+    const firm = await prisma.vCFirm.findUnique({
+      where: { slug },
     });
 
     if (!firm) {

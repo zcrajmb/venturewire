@@ -7,11 +7,12 @@ import { prisma } from '@/lib/prisma';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const article = await prisma.article.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         vcFirm: true,
         topics: true,
@@ -29,14 +30,14 @@ export async function GET(
 
     // Increment views
     await prisma.article.update({
-      where: { id: params.id },
+      where: { id },
       data: { views: { increment: 1 } },
     });
 
     // Fetch related articles (same topics or firm)
     const relatedArticles = await prisma.article.findMany({
       where: {
-        id: { not: params.id },
+        id: { not: id },
         OR: [
           {
             vcFirmId: article.vcFirmId,

@@ -27,19 +27,19 @@ export async function GET(request: NextRequest) {
           OR: [
             {
               title: {
-                search: query.split(' ').join(' | '),
+                contains: query,
                 mode: 'insensitive',
               },
             },
             {
               summary: {
-                search: query.split(' ').join(' | '),
+                contains: query,
                 mode: 'insensitive',
               },
             },
             {
               aiSummary: {
-                search: query.split(' ').join(' | '),
+                contains: query,
                 mode: 'insensitive',
               },
             },
@@ -60,19 +60,19 @@ export async function GET(request: NextRequest) {
           OR: [
             {
               title: {
-                search: query.split(' ').join(' | '),
+                contains: query,
                 mode: 'insensitive',
               },
             },
             {
               summary: {
-                search: query.split(' ').join(' | '),
+                contains: query,
                 mode: 'insensitive',
               },
             },
             {
               aiSummary: {
-                search: query.split(' ').join(' | '),
+                contains: query,
                 mode: 'insensitive',
               },
             },

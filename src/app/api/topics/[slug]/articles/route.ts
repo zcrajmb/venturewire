@@ -7,9 +7,10 @@ import { prisma } from '@/lib/prisma';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '12', 10);
@@ -17,7 +18,7 @@ export async function GET(
     const skip = (page - 1) * limit;
 
     const topic = await prisma.topic.findUnique({
-      where: { slug: params.slug },
+      where: { slug },
     });
 
     if (!topic) {
