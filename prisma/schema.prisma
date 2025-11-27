@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Article {
+  id            String   @id @default(cuid())
+  title         String
+  url           String   @unique
+  summary       String?
+  fullContent   String?
+  aiSummary     String?
+  keyTakeaways  String[]
+  category      String? // market trends, founder advice, industry analysis, investment thesis, portfolio updates
+  publishedAt   DateTime
+  scrapedAt     DateTime @default(now())
+  readingTime   Int?
+  imageUrl      String?
+  views         Int      @default(0)
+  engagement    Int      @default(0)
+  
+  vcFirmId      String
+  vcFirm        VCFirm   @relation(fields: [vcFirmId], references: [id], onDelete: Cascade)
+  
+  topics        Topic[]
+  bookmarks     Bookmark[]
+  
+  @@index([publishedAt])
+  @@index([vcFirmId])
+  @@index([views])
+  @@index([engagement])
+}
+
+model VCFirm {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  website     String
+  blogUrl     String?
+  rssUrl      String?
+  logoUrl     String?
+  description String?
+  articles    Article[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Topic {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  articles    Article[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model User {
+  id          String     @id @default(cuid())
+  email       String     @unique
+  name        String?
+  image       String?
+  bookmarks   Bookmark[]
+  
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Bookmark {
+  id          String   @id @default(cuid())
+  userId      String
+  articleId   String
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article     Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, articleId])
+  @@index([userId])
+  @@index([articleId])
+}
+
+model ScrapingLog {
+  id          String   @id @default(cuid())
+  vcFirmId    String
+  status      String   // success, failed, in_progress
+  message     String?
+  articlesFound Int    @default(0)
+  articlesAdded Int    @default(0)
+  duration    Int?     // milliseconds
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([vcFirmId])
+  @@index([createdAt])
+}
